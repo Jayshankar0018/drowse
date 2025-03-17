@@ -95,4 +95,4 @@ If you encounter any issues:
 For any additional help or credentials needed, please contact the project maintainer.
 
 ## Connect to the Project Maintainer
-[Project Maintainer - Bismay Bibhu Prakash ⇠ `Click Me`](https://github.com/Bismay07)
+[Project Maintainer - Bismay Bibhu Prakash ⇠ `Click Me`](https://www.instagram.com/_bismay.__/)
