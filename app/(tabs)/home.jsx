@@ -4,7 +4,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from '../../components/Logo'
 
 
-import Logo from "../../components/Logo"
 const Home = () => {
 	return (
 		<SafeAreaView className="bg-olive-BLACK h-full">

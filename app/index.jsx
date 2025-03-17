@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Image } from "react-native";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { images } from "../constants";
 import { StatusBar } from "expo-status-bar";
@@ -7,15 +7,22 @@ import CustomButton from "../components/CustomButton";
 import { Redirect, router } from "expo-router";
 import Logo from "../components/Logo";
 import { useGlobalContext } from "@/context/GlobalProvider";
+import authService from "@/libs/appwrite/auth";
 
 export default function App() {
 	const [isSignUpLoading, setIsSignUpLoading] = useState(false);
 	const { isLoading, isLoggedIn } = useGlobalContext();
 
+	useEffect(() => {
+		const res = authService.getCurrentUser()
+		console.log("user", res);
+		
+	}, [])
+
 	const handleSignUp = async () => {
 		try {
 			setIsSignUpLoading(true);
-			await router.push('/sign-up');
+			router.push('/sign-up');
 		} catch (error) {
 			console.error('Navigation error:', error);
 		} finally {
