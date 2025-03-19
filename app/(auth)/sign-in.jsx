@@ -5,9 +5,11 @@ import FormField from "../../components/FormField";
 import CustomButton from "../../components/CustomButton";
 import { Link, router } from "expo-router";
 import authService from "../../libs/appwrite/auth";
-import Logo from '../../components/Logo'
+import Logo from "../../components/Logo";
 import OAuthGrid from "../../components/OAuthGrid";
+import { useGlobalContext } from "../../context/GlobalProvider";
 const SignIn = () => {
+	const { setIsLoggedIn, setUser } = useGlobalContext();
 	const [isSubmiting, setIsSubmiting] = useState(false);
 	const submit = async () => {
 		if (form.email.trim() === "" || form.password.trim() === "") {
@@ -16,14 +18,16 @@ const SignIn = () => {
 		}
 		setIsSubmiting(true);
 		try {
-			const session = await authService.signIn(form.email, form.password);
-
-			// set the user to global state... using context
-			console.log("session",session);
-
-			router.replace("/home");
+			const user = await authService.signIn(form.email, form.password);
+			if (user) {
+				setUser(user);
+				setIsLoggedIn(true);
+				router.replace("/home");
+			} else {
+				throw new Error("Failed to get user data");
+			}
 		} catch (error) {
-			console.log("error",error);
+			console.log("error", error);
 			Alert.alert("Log In", error.message);
 		} finally {
 			setIsSubmiting(false);
@@ -37,7 +41,7 @@ const SignIn = () => {
 		<SafeAreaView className="bg-olive-BLACK w-full h-full">
 			<ScrollView>
 				<View className="w-full justify-center h-full px-4 my-6">
-				<Logo
+					<Logo
 						color="#9baf99"
 						withName={true}
 						size={50}

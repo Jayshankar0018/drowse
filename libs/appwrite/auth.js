@@ -67,30 +67,58 @@ class Authentication {
 	};
 
 	signIn = async (email, password) => {
-		try {
-			const session = await this.account.createEmailPasswordSession(
-				email,
-				password
-			);
 
-			// Get user data and store in AsyncStorage
+		if (this.account) {
+			console.log(this.account);
+		}
+
+		let session = null;
+		let user = null;
+
+		try {
+			// Create email session
+			console.log("1");
+			session = await this.account.createEmailPasswordSession(email, password);
+			console.log("2");
+			if (!session?.$id) {
+				throw new Error("Invalid session response");
+			}
+
+			// Store session immediately
+			await AsyncStorage.setItem("session", JSON.stringify(session));
+
+			// Get account info
 			const currentAccount = await this.account.get();
+			if (!currentAccount?.$id) {
+				throw new Error("Failed to retrieve account information");
+			}
+
+			// Get user data
 			const userData = await this.databases.listDocuments(
 				conf.databaseId,
 				conf.usersCollectionId,
 				[Query.equal("accountId", currentAccount.$id)]
 			);
 
-			if (userData.documents.length > 0) {
-				await AsyncStorage.setItem(
-					"user",
-					JSON.stringify(userData.documents[0])
-				);
-				await AsyncStorage.setItem("session", JSON.stringify(session));
+			if (!userData?.documents?.length) {
+				throw new Error("User data not found in database");
 			}
 
-			return session;
+			user = userData.documents[0];
+			await AsyncStorage.setItem("user", JSON.stringify(user));
+			return user;
+
 		} catch (error) {
+			// Clean up any stored data on error
+			await AsyncStorage.removeItem("session");
+			await AsyncStorage.removeItem("user");
+
+			// Handle specific error cases
+			if (error.message.includes("Invalid credentials")) {
+				throw new Error("Invalid email or password");
+			}
+
+			console.error("Sign in error:", error);
 			throw new Error(error.message || "Failed to sign in");
 		}
 	};

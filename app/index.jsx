@@ -22,7 +22,7 @@ export default function App() {
 	const handleSignUp = async () => {
 		try {
 			setIsSignUpLoading(true);
-			router.push('/sign-up');
+			router.push('/home');
 		} catch (error) {
 			console.error('Navigation error:', error);
 		} finally {
