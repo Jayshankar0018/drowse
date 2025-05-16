@@ -8,6 +8,7 @@ import { Redirect, router } from "expo-router";
 import Logo from "../components/Logo";
 import { useGlobalContext } from "@/context/GlobalProvider";
 import authService from "@/libs/appwrite/auth";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function App() {
 	const [isSignUpLoading, setIsSignUpLoading] = useState(false);
@@ -16,13 +17,15 @@ export default function App() {
 	useEffect(() => {
 		const res = authService.getCurrentUser()
 		console.log("user", res);
+		console.log("stored user : ", AsyncStorage.getItem('user'));
+		
 		
 	}, [])
 
 	const handleSignUp = async () => {
 		try {
 			setIsSignUpLoading(true);
-			router.push('/home');
+			router.push('/sign-up');
 		} catch (error) {
 			console.error('Navigation error:', error);
 		} finally {
