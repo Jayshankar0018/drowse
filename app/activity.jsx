@@ -4,6 +4,7 @@ import { FontAwesome } from "@expo/vector-icons";
 import { Touchable } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import ActivityCard from "../components/ActivityCard";
+import EyeDetector from "../components/detector/EyeDetector";
 
 const Activity = () => {
   const { time } = useLocalSearchParams();
@@ -47,11 +48,12 @@ const Activity = () => {
           <Text>Graph</Text>
         </View>
       </View>
+      <EyeDetector />
       <View className='bg-[#ffffff] mx-4 mt-4 h-full rounded-xl items-center'>
-            <ActivityCard name={'Google'} icon={'google'} time={'14min'}/>
-            <ActivityCard name={'Play Games'} icon={'play'} time={'16min'}/>
-            <ActivityCard name={'Youtube'} icon={'youtube'} time={'24min'}/>
-            <ActivityCard name={'Instagram'} icon={'instagram'} time={'35min'}/>
+        <ActivityCard name={'Google'} icon={'google'} time={'14min'} />
+        <ActivityCard name={'Play Games'} icon={'play'} time={'16min'} />
+        <ActivityCard name={'Youtube'} icon={'youtube'} time={'24min'} />
+        <ActivityCard name={'Instagram'} icon={'instagram'} time={'35min'} />
       </View>
     </View>
   );
