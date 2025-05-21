@@ -22,7 +22,7 @@ const Home = () => {
 			<TouchableOpacity onPress={() => {
 				router.push({ pathname: 'activity', params: { time } })
 			}}>
-				<View className="bg-[#ffffff] rounded-3xl mx-4 px-8 py-16 mt-8 flex-row items-center">
+				<View className="bg-[#ffffff] rounded-3xl mx-4 px-8 py-16 mt-8 grid grid-cols-3 items-center">
 					<View>
 						<Text className="text-4xl font-bold">{time}</Text>
 						<Text className="text-md font-semibold">Time Spent Today</Text>
@@ -42,15 +42,15 @@ const Home = () => {
 						<View className="w-1/4">
 							<Image source={pixel} className="w-12 h-20" />
 						</View>
-						<View className="flex-row w-2/3 justify-start">
+						<View className="flex-row w-2/3 justify-between items-center">
 							<View>
-								<Text className="text-3xl font-semibold">Google Pixel 9</Text>
+								<Text className="text-3xl font-semibold">Toddler Mode</Text>
 								<Text className="text-[#4682fb] font-bold text-lg">
 									Unlocked
 								</Text>
 							</View>
 							<View>
-								<Text className="text-3xl ">{">"}</Text>
+								<FontAwesome name="angle-right" size={35} />
 							</View>
 						</View>
 					</View>
