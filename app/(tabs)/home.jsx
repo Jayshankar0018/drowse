@@ -12,10 +12,12 @@ import Logo from "../../components/Logo";
 import pixel from "../../assets/images/pixel9pro.png";
 import { FontAwesome } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useGlobalContext } from "../../context/GlobalProvider";
 // import { FontAwesome } from "@expo/vector-icons";
 
 const Home = () => {
 	const time = '2h 36m'
+	const { enableDeviceAdmin, registerBackgroundTask, lockSystem } = useGlobalContext()
 	return (
 		<SafeAreaView className="bg-olive-BLACK h-full">
 			{/* <Logo /> */}
@@ -54,7 +56,9 @@ const Home = () => {
 							</View>
 						</View>
 					</View>
-					<TouchableOpacity>
+					<TouchableOpacity onPress={() => {
+						lockSystem()
+					}}>
 						<View className="bg-[#aedcff] w-[80vw] py-4 rounded-full">
 							<Text className="text-xl text-center font-semibold">Lock</Text>
 						</View>

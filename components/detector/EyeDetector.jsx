@@ -24,7 +24,7 @@ const MIN_BRIGHTNESS = 0.1;
 const MAX_BRIGHTNESS = 1.0;
 const BRIGHTNESS_UPDATE_INTERVAL = 3000; // 3 seconds
 const BRIGHTNESS_CHANGE_THRESHOLD = 0.05; // Minimum change to update
-const BRIGHTNESS_TRANSITION_DURATION = 30; // ms for smooth transition
+const BRIGHTNESS_TRANSITION_DURATION = 15; // ms for smooth transition
 
 // Clamped brightness setter
 const setBrightnessOnJS = async (value) => {
