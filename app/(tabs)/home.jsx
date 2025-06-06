@@ -6,7 +6,7 @@ import {
 	TouchableOpacity,
 	TouchableHighlight,
 } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Logo from "../../components/Logo";
 import pixel from "../../assets/images/pixel9pro.png";
@@ -17,7 +17,12 @@ import { useGlobalContext } from "../../context/GlobalProvider";
 
 const Home = () => {
 	const time = '2h 36m'
-	const { enableDeviceAdmin, registerBackgroundTask, lockSystem } = useGlobalContext()
+	const { requestUsageStatsPermission, getUsageStats, enableDeviceAdmin, registerBackgroundTask, lockSystem } = useGlobalContext()
+
+	// useEffect(() => {
+	// 	requestUsageStatsPermission()
+	// }, [])
+
 	return (
 		<SafeAreaView className="bg-olive-BLACK h-full">
 			{/* <Logo /> */}
@@ -65,6 +70,15 @@ const Home = () => {
 					</TouchableOpacity>
 				</View>
 			</TouchableOpacity>
+
+			<TouchableOpacity onPress={() => {
+				getUsageStats()
+			}}>
+				<View className="bg-[#ffffff] gap-3 rounded-t-3xl mb-1 mx-4 px-8 py-10 mt-8 flex-row items-center">
+					<Text>Stats</Text>
+				</View>
+			</TouchableOpacity>
+
 			<TouchableOpacity>
 				<View className="bg-[#ffffff] gap-3 rounded-t-3xl mb-1 mx-4 px-8 py-10 mt-8 flex-row items-center">
 					<View>
@@ -76,6 +90,7 @@ const Home = () => {
 					</View>
 				</View>
 			</TouchableOpacity>
+
 			<TouchableOpacity>
 				<View className="bg-[#ffffff] gap-3 rounded-b-3xl mx-4 px-8 py-10 mt-1 flex-row items-center">
 					<View>
