@@ -18,7 +18,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.bismay.drowse",
-      "permissions": ["android.permission.WRITE_SETTINGS", "DEVICE_ADMIN"]
+      "permissions": ["android.permission.WRITE_SETTINGS", "DEVICE_ADMIN", "PACKAGE_USAGE_STATS", "android.permission.CAMERA"]
     },
     "web": {
       "bundler": "metro",

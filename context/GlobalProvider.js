@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import authService from "../libs/appwrite/auth";
-import { NativeModules, Linking, Alert } from "react-native";
+import { NativeModules, Linking, Alert, Platform } from "react-native";
 
 import * as TaskManager from "expo-task-manager";
 import * as BackgroundFetch from "expo-background-fetch";
@@ -44,7 +44,16 @@ export default GlobalProvider = ({ children }) => {
     try {
       console.log("Running screen lock task");
       if (NativeModules.ScreenLock) {
-        NativeModules.ScreenLock.lockScreen();
+        await NativeModules.ScreenLock.lockScreen();
+
+        const usageStats = await new Promise((resolve, reject) => {
+          NativeModules.ScreenLock.getAppUsageStats(
+            (result) => resolve(result),
+            (error) => reject(error)
+          );
+        });
+        console.log("App Usage Stats : ", usageStats);
+
         return BackgroundFetch.BackgroundFetchResult.NewData;
       }
     } catch (error) {
@@ -53,15 +62,57 @@ export default GlobalProvider = ({ children }) => {
     }
   });
 
+  const getUsageStats = async () => {
+    console.log("clicking");
+    // const usageStats = await new Promise((resolve, reject) => {
+    //   NativeModules.ScreenLock.getAppUsageStats(
+    //     (result) => {
+    //       console.log("Raw usage stats:", result);
+
+    //       resolve(result);
+    //     },
+    //     (error) => {
+    //       console.log("ERROR : ", error);
+
+    //       reject(error);
+    //     }
+    //   );
+    // });
+
+    const stats = await new Promise((resolve, reject) => {
+      NativeModules.ScreenLock.getAppUsageStats(resolve, reject);
+    });
+    console.log("Stats : ", stats);
+
+    // console.log("App Usage Stats : ", usageStats);
+  };
+
   const lockSystem = async () => {
     try {
       // TaskManager.startTask(BACKGROUND_LOCK_TASK);
       if (NativeModules.ScreenLock) {
-        NativeModules.ScreenLock.lockScreen();
+        const res = NativeModules.ScreenLock.lockScreen();
+        if (res.status !== 200) {
+          Alert.alert("Error", "Failed to lock screen");
+        }
       }
       // enableDeviceAdmin();
     } catch (e) {
       console.log(e);
+    }
+  };
+
+  const requestUsageStatsPermission = () => {
+    if (Platform.OS === "android") {
+      try {
+        Linking.openSettings();
+        Alert.alert(
+          "Permission Required",
+          'Please enable "Apps with usage access" for this app in Settings > Security.'
+        );
+      } catch (error) {
+        Alert.alert("Error", "Unable to open settings: " + error.message);
+      }
     }
   };
 
@@ -77,7 +128,7 @@ export default GlobalProvider = ({ children }) => {
       return;
     }
     await BackgroundFetch.registerTaskAsync(BACKGROUND_LOCK_TASK, {
-      minimumInterval: 10,
+      minimumInterval: 10 * 60,
       stopOnTerminate: false,
       startOnBoot: true,
     });
@@ -116,6 +167,8 @@ export default GlobalProvider = ({ children }) => {
         enableDeviceAdmin,
         registerBackgroundTask,
         lockSystem,
+        getUsageStats,
+        requestUsageStatsPermission,
       }}
     >
       {children}

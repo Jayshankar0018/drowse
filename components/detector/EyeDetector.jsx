@@ -24,7 +24,7 @@ const MIN_BRIGHTNESS = 0.1;
 const MAX_BRIGHTNESS = 1.0;
 const BRIGHTNESS_UPDATE_INTERVAL = 3000; // 3 seconds
 const BRIGHTNESS_CHANGE_THRESHOLD = 0.05; // Minimum change to update
-const BRIGHTNESS_TRANSITION_DURATION = 15; // ms for smooth transition
+const BRIGHTNESS_TRANSITION_DURATION = 5; // ms for smooth transition
 
 // Clamped brightness setter
 const setBrightnessOnJS = async (value) => {
@@ -45,7 +45,7 @@ export default function EyeDetector() {
   const faceDetectionOption = useRef < FaceDetectionOptions > ({
     trackingEnabled: true,
     landmarkMode: 'all',
-    minDetectionInterval: 200, // Reduce CPU load
+    minDetectionInterval: 100, // Reduce CPU load
   }).current;
   const device = useCameraDevice('front');
   const { hasPermission, requestPermission } = useCameraPermission();

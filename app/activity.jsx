@@ -12,8 +12,7 @@ const Activity = () => {
   return (
     <ScrollView style={{ height: '100%' }} scrollEnabled>
       <View
-        className="bg-[#ffffff] flex-row justify-between items-center px-8 py-4
-        "
+        className="bg-[#ffffff] flex-row justify-between items-center px-8 py-4"
       >
         <TouchableOpacity
           onPress={() => {
