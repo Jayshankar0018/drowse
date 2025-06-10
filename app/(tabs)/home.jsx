@@ -15,6 +15,7 @@ import { router } from "expo-router";
 import { useGlobalContext } from "../../context/GlobalProvider";
 import { StatusBar } from "expo-status-bar";
 import { ScrollView } from "react-native";
+import { NativeModules } from "react-native";
 // import { FontAwesome } from "@expo/vector-icons";
 
 const Home = () => {
@@ -92,8 +93,9 @@ const Home = () => {
 							</View>
 						</View>
 						<TouchableOpacity
-							onPress={() => {
+							onPress={async () => {
 								isToddlerModeActive ? stopToddlerMode() : startToddlerMode();
+								// await NativeModules.ScreenLock.lockScreen();
 							}}
 						>
 							<View className="bg-orange-peel-400 w-[80vw] py-4 rounded-full">
@@ -105,7 +107,7 @@ const Home = () => {
 				{/* Stats */}
 
 
-				{/* <TouchableOpacity
+				<TouchableOpacity
 					onPress={() => {
 						getUsageStats();
 					}}
@@ -113,11 +115,13 @@ const Home = () => {
 					<View className="bg-[#ffffff] gap-3 rounded-3xl mb-1 mx-4 px-8 py-10 mt-8 flex-row items-center">
 						<Text>Stats</Text>
 					</View>
-				</TouchableOpacity> */}
+				</TouchableOpacity>
 				{/* Time limits */}
 
 
-				<TouchableOpacity>
+				<TouchableOpacity onPress={()=>{
+					router.push({pathname: "timelimit"})
+				}}>
 					<View className="bg-olive-50 gap-3 rounded-t-3xl mb-1 mx-4 px-5 py-5 mt-8 flex-row items-center">
 						<View >
 							<FontAwesome name="hourglass-half" size={25} color="#e27700" />
