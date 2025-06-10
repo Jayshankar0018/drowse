@@ -12,6 +12,7 @@ export default GlobalProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isToddlerModeActive, setIsToddlerModeActive] = useState(false);
 
   // Function for enabling admin previledge
   const enableDeviceAdmin = () => {
@@ -38,29 +39,70 @@ export default GlobalProvider = ({ children }) => {
   };
 
   // Defining Background task
-  const BACKGROUND_LOCK_TASK = "background-lock-screen";
 
-  TaskManager.defineTask(BACKGROUND_LOCK_TASK, async () => {
+  const TODDLER_MODE_TASK = "toddler-mode-lock-screen";
+
+  TaskManager.defineTask(TODDLER_MODE_TASK, async () => {
     try {
-      console.log("Running screen lock task");
-      if (NativeModules.ScreenLock) {
+      if(isToddlerModeActive && NativeModules.ScreenLock){
         await NativeModules.ScreenLock.lockScreen();
-
-        const usageStats = await new Promise((resolve, reject) => {
-          NativeModules.ScreenLock.getAppUsageStats(
-            (result) => resolve(result),
-            (error) => reject(error)
-          );
-        });
-        console.log("App Usage Stats : ", usageStats);
-
         return BackgroundFetch.BackgroundFetchResult.NewData;
       }
+      return BackgroundFetch.BackgroundFetchResult.NoData;
     } catch (error) {
-      console.error("Background task error:", error);
+      console.error("Toddle mode task error: ", error);
       return BackgroundFetch.BackgroundFetchResult.Failed;
     }
   });
+
+  const startToddlerMode = async () => {
+    try {
+      setIsToddlerModeActive(true);
+      await BackgroundFetch.registerTaskAsync(TODDLER_MODE_TASK, {
+        minimumInterval: 3,
+        stopOnTerminate: false,
+        startOnBoot: true
+        // exactAndAllowWhileIdle: true
+      });
+      enableDeviceAdmin()
+    } catch (error) {
+      console.error("Error starting toddler mode: ", error);
+      Alert.alert("Error", "Failed to activate Toddler Mode");
+    }
+  }
+
+  const stopToddlerMode = async () => {
+    try {
+      setIsToddlerModeActive(false);
+      await BackgroundFetch.unregisterTaskAsync(TODDLER_MODE_TASK);
+      Alert.alert("Toddler Mode", "Toddler Mode has been stopped");
+    } catch (error) {
+      console.error("Error stopping toddler mode: ", error);
+    }
+  }
+  // const BACKGROUND_LOCK_TASK = "background-lock-screen";
+
+  // TaskManager.defineTask(BACKGROUND_LOCK_TASK, async () => {
+  //   try {
+  //     console.log("Running screen lock task");
+  //     if (NativeModules.ScreenLock) {
+  //       await NativeModules.ScreenLock.lockScreen();
+
+  //       const usageStats = await new Promise((resolve, reject) => {
+  //         NativeModules.ScreenLock.getAppUsageStats(
+  //           (result) => resolve(result),
+  //           (error) => reject(error)
+  //         );
+  //       });
+  //       console.log("App Usage Stats : ", usageStats);
+
+  //       return BackgroundFetch.BackgroundFetchResult.NewData;
+  //     }
+  //   } catch (error) {
+  //     console.error("Background task error:", error);
+  //     return BackgroundFetch.BackgroundFetchResult.Failed;
+  //   }
+  // });
 
   const getUsageStats = async () => {
     console.log("clicking");
@@ -78,29 +120,31 @@ export default GlobalProvider = ({ children }) => {
     //     }
     //   );
     // });
+    requestUsageStatsPermission();
 
     const stats = await new Promise((resolve, reject) => {
-      NativeModules.ScreenLock.getAppUsageStats(resolve, reject);
+      NativeModules.ScreenLock.getAppUsageStats(resolve, reject); 
     });
+
     console.log("Stats : ", stats);
 
     // console.log("App Usage Stats : ", usageStats);
   };
 
-  const lockSystem = async () => {
-    try {
-      // TaskManager.startTask(BACKGROUND_LOCK_TASK);
-      if (NativeModules.ScreenLock) {
-        const res = NativeModules.ScreenLock.lockScreen();
-        if (res.status !== 200) {
-          Alert.alert("Error", "Failed to lock screen");
-        }
-      }
-      // enableDeviceAdmin();
-    } catch (e) {
-      console.log(e);
-    }
-  };
+  // const lockSystem = async () => {
+  //   try {
+  //     // TaskManager.startTask(BACKGROUND_LOCK_TASK);
+  //     if (NativeModules.ScreenLock) {
+  //       const res = NativeModules.ScreenLock.lockScreen();
+  //       if (res.status !== 200) {
+  //         Alert.alert("Error", "Failed to lock screen");
+  //       }
+  //     }
+  //     // enableDeviceAdmin();
+  //   } catch (e) {
+  //     console.log(e);
+  //   }
+  // };
 
   const requestUsageStatsPermission = () => {
     if (Platform.OS === "android") {
@@ -160,13 +204,15 @@ export default GlobalProvider = ({ children }) => {
     <GlobalContext.Provider
       value={{
         isLoading,
+        isToddlerModeActive,
         isLoggedIn,
         user,
+        startToddlerMode,
+        stopToddlerMode,
         setIsLoggedIn,
         setUser,
         enableDeviceAdmin,
         registerBackgroundTask,
-        lockSystem,
         getUsageStats,
         requestUsageStatsPermission,
       }}

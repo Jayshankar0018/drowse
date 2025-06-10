@@ -37,6 +37,7 @@ export default function RootLayout() {
 				<StatusBar style={"auto"} />
 				<Stack.Screen name={"index"} />
 				<Stack.Screen name={"(auth)"} />
+				<Stack.Screen name={"activity"} />
 			</Stack>
 		</GlobalProvider>
 	);

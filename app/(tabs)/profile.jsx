@@ -1,9 +1,10 @@
-import { View, Text, Button, TouchableOpacity } from 'react-native'
+import { View, Text, Button, TouchableOpacity, SafeAreaView } from 'react-native'
 import React, { useContext } from 'react'
 import authService from '../../libs/appwrite/auth'
 import CustomButton from '../../components/CustomButton'
 import { router } from 'expo-router'
 import { useGlobalContext } from '../../context/GlobalProvider'
+import { StatusBar } from 'expo-status-bar'
 
 const Profile = () => {
 
@@ -27,8 +28,8 @@ const Profile = () => {
   }
 
   return (
-    <View>
-      <Text>Profile</Text>
+    <SafeAreaView className="bg-olive-BLACK h-full w-full">
+      <StatusBar backgroundColor="#2e382e" style="light" />
       <CustomButton
         containerStyle="mt-6"
         title={"Logout"}
@@ -65,7 +66,7 @@ const Profile = () => {
           <Text className='text-center'>Lock</Text>
         </View>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   )
 }
 
