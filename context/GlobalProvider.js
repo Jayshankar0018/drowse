@@ -44,7 +44,9 @@ export default GlobalProvider = ({ children }) => {
 
   TaskManager.defineTask(TODDLER_MODE_TASK, async () => {
     try {
-      if(isToddlerModeActive && NativeModules.ScreenLock){
+      console.log(isToddlerModeActive);
+      
+      if(NativeModules.ScreenLock && isToddlerModeActive){
         await NativeModules.ScreenLock.lockScreen();
         return BackgroundFetch.BackgroundFetchResult.NewData;
       }
@@ -58,11 +60,14 @@ export default GlobalProvider = ({ children }) => {
   const startToddlerMode = async () => {
     try {
       setIsToddlerModeActive(true);
-      await BackgroundFetch.registerTaskAsync(TODDLER_MODE_TASK, {
+      BackgroundFetch.registerTaskAsync(TODDLER_MODE_TASK, {
         minimumInterval: 3,
         stopOnTerminate: false,
-        startOnBoot: true
+        startOnBoot: true,
         // exactAndAllowWhileIdle: true
+      }).then(data=>{
+        console.log("Activated", isToddlerModeActive);
+        
       });
       enableDeviceAdmin()
     } catch (error) {
@@ -120,11 +125,12 @@ export default GlobalProvider = ({ children }) => {
     //     }
     //   );
     // });
-    requestUsageStatsPermission();
+    // requestUsageStatsPermission();
+    const granted = await NativeModules.ScreenLock.checkUsagePermission()
+    console.log(granted);
+    
 
-    const stats = await new Promise((resolve, reject) => {
-      NativeModules.ScreenLock.getAppUsageStats(resolve, reject); 
-    });
+    const stats = await NativeModules.ScreenLock.getAppUsageStats();
 
     console.log("Stats : ", stats);
 
