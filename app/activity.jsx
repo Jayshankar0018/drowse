@@ -6,18 +6,26 @@ import {
 	ScrollView,
 	SafeAreaView,
 } from "react-native";
-import React from "react";
+import React, { useContext, useEffect } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 import { Touchable } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import ActivityCard from "../components/ActivityCard";
 import EyeDetector from "../components/detector/EyeDetector";
 import Graph from "../components/Graph";
+import { useGlobalContext } from "../context/GlobalProvider";
 
 const Activity = () => {
 	const { time } = useLocalSearchParams();
+  const {stats} = useGlobalContext()
+
+  useEffect(()=>{
+    console.log(stats);
+    
+  }, [])
+
 	return (
-		<SafeAreaView className="h-full w-full pt-10 bg-olive-BLACK">
+		<SafeAreaView className="h-full w-full pb-2 pt-10 bg-olive-BLACK">
 			<ScrollView>
 				<View className="flex-row justify-center items-center px-8 py-4">
 					<Text className="text-3xl text-center text-white">Activity</Text>
@@ -50,11 +58,17 @@ const Activity = () => {
 					</View>
 				</View>
 				<EyeDetector />
-				<View className="bg-[#ffffff] mx-4 mt-4 h-full rounded-xl items-center">
-					<ActivityCard name={"Google"} icon={"google"} time={"14min"} />
-					<ActivityCard name={"Play Games"} icon={"play"} time={"16min"} />
-					<ActivityCard name={"Youtube"} icon={"youtube"} time={"24min"} />
-					<ActivityCard name={"Instagram"} icon={"instagram"} time={"35min"} />
+				<View className="bg-[#ffffff] mx-4 mb-4 mt-4 h-full rounded-xl items-center">
+				{
+          stats.map((stat, index)=>{
+            if(stat.totalTimeInForeground > 0){
+              return(
+              <ActivityCard key={index} name={stat.appName} icon={stat.appIcon} time={stat.totalTimeInForeground}/>
+            )
+            }
+            
+          })
+        }
 				</View>
 			</ScrollView>
 		</SafeAreaView>

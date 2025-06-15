@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import GlobalProvider from "../context/GlobalProvider"
 import { StatusBar } from "expo-status-bar";
 SplashScreen.preventAutoHideAsync();
+import EyeDetector from "../components/detector/EyeDetector";
 
 export default function RootLayout() {
 	const [fontsLoaded, error] = useFonts({
@@ -33,6 +34,7 @@ export default function RootLayout() {
 
 	return (
 		<GlobalProvider>
+			{/* <EyeDetector /> */}
 			<Stack screenOptions={{ headerShown: false }}>
 				<StatusBar style={"auto"} />
 				<Stack.Screen name={"index"} />

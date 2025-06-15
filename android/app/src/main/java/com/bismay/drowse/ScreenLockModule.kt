@@ -16,8 +16,12 @@ import android.app.usage.UsageStats
 import android.app.usage.UsageStatsManager
 import android.content.ComponentName
 import android.content.Context
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
@@ -25,8 +29,9 @@ import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.bridge.Arguments
-import java.io.ByteArrayOutputStream
-import java.util.*
+import com.facebook.react.bridge.*
+import java
+
 import android.util.Log
 import android.util.Base64
 import com.facebook.react.modules.core.DeviceEventManagerModule
@@ -99,16 +104,83 @@ class ScreenLockModule(reactContext: ReactApplicationContext) : ReactContextBase
     }
 
     private fun getAppIconBase64(packageName: String): String? {
-        return try {
+        try {
+            Log.v("AppUsageModule", "Fetching icon for $packageName")
             val packageManager = reactApplicationContext.packageManager
-            val drawable = packageManager.getApplicationIcon(packageName)
-            val bitmap = (drawable as? BitmapDrawable)?.bitmap ?: return null
+            val appInfo = packageManager.getApplicationInfo(packageName, 0)
+
+            // Try multiple methods to get the icon
+            var drawable: Drawable? = null
+            try {
+                drawable = packageManager.getApplicationIcon(appInfo)
+            } catch (e: PackageManager.NameNotFoundException) {
+                Log.w("AppUsageModule", "getApplicationIcon failed for $packageName: ${e.message}")
+            }
+
+            // Fallback: Try loading icon from resources
+            if (drawable == null && appInfo.icon != 0) {
+                try {
+                    drawable = packageManager.getDrawable(packageName, appInfo.icon, appInfo)
+                    Log.v("AppUsageModule", "Loaded icon from resources for $packageName")
+                } catch (e: Exception) {
+                    Log.w("AppUsageModule", "Failed to load resource icon for $packageName: ${e.message}")
+                }
+            }
+
+            if (drawable == null) {
+                Log.w("AppUsageModule", "No drawable found for $packageName")
+                return null
+            }
+
+            // Convert drawable to bitmap
+            val bitmap = when (drawable) {
+                is BitmapDrawable -> {
+                    Log.v("AppUsageModule", "Drawable for $packageName is BitmapDrawable")
+                    drawable.bitmap
+                }
+                is AdaptiveIconDrawable -> {
+                    Log.v("AppUsageModule", "Drawable for $packageName is AdaptiveIconDrawable")
+                    // Combine foreground and background layers
+                    val size = 48
+                    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    drawable.setBounds(0, 0, size, size)
+                    drawable.draw(canvas)
+                    bitmap
+                }
+                else -> {
+                    Log.v("AppUsageModule", "Drawable for $packageName is ${drawable.javaClass.name}, converting to bitmap")
+                    val size = 48
+                    val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    drawable.setBounds(0, 0, size, size)
+                    drawable.draw(canvas)
+                    bitmap
+                }
+            }
+
+            if (bitmap == null || bitmap.isRecycled) {
+                Log.w("AppUsageModule", "Bitmap is null or recycled for $packageName")
+                return null
+            }
+
+            // Compress bitmap to PNG and encode to Base64
             val stream = ByteArrayOutputStream()
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
-            val byteArray = stream.toByteArray()
-            Base64.encodeToString(byteArray, Base64.DEFAULT)
+            try {
+                bitmap.compress(Bitmap.CompressFormat.PNG, 80, stream)
+                val byteArray = stream.toByteArray()
+                val base64 = Base64.encodeToString(byteArray, Base64.DEFAULT)
+                Log.v("AppUsageModule", "Encoded icon for $packageName, Base64 length: ${base64.length}")
+                return base64
+            } finally {
+                stream.close()
+            }
+        } catch (e: PackageManager.NameNotFoundException) {
+            Log.w("AppUsageModule", "Package not found for $packageName: ${e.message}")
+            return null
         } catch (e: Exception) {
-            null
+            Log.e("AppUsageModule", "Failed to encode icon for $packageName: ${e.message}", e)
+            return null
         }
     }
 

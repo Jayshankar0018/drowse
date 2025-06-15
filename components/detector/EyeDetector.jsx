@@ -169,7 +169,7 @@ export default function EyeDetector() {
       console.log(`[Fallback] Checking brightness: ${currentBrightness.value}`);
       const success = await setBrightnessOnJS(currentBrightness.value);
       if (!success) {
-        console.log('[Fallback] Retrying brightness set');
+        // console.log('[Fallback] Retrying brightness set');
         await setBrightnessOnJS(MAX_BRIGHTNESS);
         currentBrightness.value = MAX_BRIGHTNESS;
         brightnessValue.value = MAX_BRIGHTNESS;
@@ -180,16 +180,16 @@ export default function EyeDetector() {
 
   // Handle face detection
   const handleDetectedFaces = Worklets.createRunOnJS((faces) => {
-    console.log(`[Faces] handleDetectedFaces called with ${faces.length} faces`);
+    // console.log(`[Faces] handleDetectedFaces called with ${faces.length} faces`);
     const now = Date.now();
     if (now - lastUpdateTime.value < BRIGHTNESS_UPDATE_INTERVAL) {
-      console.log('[Faces] Skipping: interval not elapsed');
+      // console.log('[Faces] Skipping: interval not elapsed');
       return;
     }
     lastUpdateTime.value = now;
 
     if (faces.length === 0) {
-      console.log('[Faces] No faces detected');
+      // console.log('[Faces] No faces detected');
       runOnJS(setDistance)(null);
       runOnJS(smoothBrightnessTransition)(MAX_BRIGHTNESS);
       runOnJS(clearTimeout)(timeoutRef.current);
@@ -201,7 +201,7 @@ export default function EyeDetector() {
       const { LEFT_EYE, RIGHT_EYE } = landmarks;
 
       if (!LEFT_EYE || !RIGHT_EYE) {
-        console.log('[Faces] Eyes not detected');
+        // console.log('[Faces] Eyes not detected');
         runOnJS(setDistance)(null);
         runOnJS(smoothBrightnessTransition)(MAX_BRIGHTNESS);
         runOnJS(clearTimeout)(timeoutRef.current);
@@ -212,10 +212,10 @@ export default function EyeDetector() {
       const pixelDistance = Math.sqrt(
         Math.pow(RIGHT_EYE.x - LEFT_EYE.x, 2) + Math.pow(RIGHT_EYE.y - LEFT_EYE.y, 2)
       );
-      console.log(`[Faces] Pixel distance: ${pixelDistance}`);
+      // console.log(`[Faces] Pixel distance: ${pixelDistance}`);
 
       if (pixelDistance <= 0) {
-        console.log('[Faces] Invalid pixel distance, skipping');
+        // console.log('[Faces] Invalid pixel distance, skipping');
         runOnJS(setDistance)(null);
         runOnJS(smoothBrightnessTransition)(MAX_BRIGHTNESS);
         runOnJS(clearTimeout)(timeoutRef.current);
@@ -223,7 +223,7 @@ export default function EyeDetector() {
       }
 
       const estimateDistance = (ACTUAL_EYE_DISTANCE * FOCAL_LENGTH) / pixelDistance;
-      console.log(`[Faces] Estimated distance: ${estimateDistance}`);
+      // console.log(`[Faces] Estimated distance: ${estimateDistance}`);
       runOnJS(setDistance)(estimateDistance);
 
       let targetBrightness = MAX_BRIGHTNESS;
@@ -240,7 +240,7 @@ export default function EyeDetector() {
         runOnJS(clearTimeout)(timeoutRef.current);
       }
 
-      console.log(`[Faces] Target brightness: ${targetBrightness}`);
+      // console.log(`[Faces] Target brightness: ${targetBrightness}`);
       runOnJS(smoothBrightnessTransition)(targetBrightness);
     } catch (error) {
       console.error('[Faces] Error in handleDetectedFaces:', error);

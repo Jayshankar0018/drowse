@@ -13,6 +13,7 @@ export default GlobalProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isToddlerModeActive, setIsToddlerModeActive] = useState(false);
+  const [stats, setStats] = useState([]);
 
   // Function for enabling admin previledge
   const enableDeviceAdmin = () => {
@@ -130,9 +131,9 @@ export default GlobalProvider = ({ children }) => {
     console.log(granted);
     
 
-    const stats = await NativeModules.ScreenLock.getAppUsageStats();
-
-    console.log("Stats : ", stats);
+    const statistics = await NativeModules.ScreenLock.getAppUsageStats();
+    setStats(statistics)
+    // console.log("Stats : ", stats);
 
     // console.log("App Usage Stats : ", usageStats);
   };
@@ -221,6 +222,7 @@ export default GlobalProvider = ({ children }) => {
         registerBackgroundTask,
         getUsageStats,
         requestUsageStatsPermission,
+        stats
       }}
     >
       {children}

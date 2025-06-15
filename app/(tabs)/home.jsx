@@ -53,7 +53,8 @@ const Home = () => {
 
 
 				<TouchableOpacity
-					onPress={() => {
+					onPress={async () => {
+						await getUsageStats();
 						router.push({ pathname: "activity", params: { time }});
 					}}
 				>
@@ -107,7 +108,7 @@ const Home = () => {
 				{/* Stats */}
 
 
-				<TouchableOpacity
+				{/* <TouchableOpacity
 					onPress={() => {
 						getUsageStats();
 					}}
@@ -115,7 +116,7 @@ const Home = () => {
 					<View className="bg-[#ffffff] gap-3 rounded-3xl mb-1 mx-4 px-8 py-10 mt-8 flex-row items-center">
 						<Text>Stats</Text>
 					</View>
-				</TouchableOpacity>
+				</TouchableOpacity> */}
 				{/* Time limits */}
 
 
